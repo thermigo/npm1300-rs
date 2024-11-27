@@ -32,7 +32,7 @@ async fn main(_spawner: Spawner) {
 
     let twi = Twim::new(p.TWISPI0, Irqs, p.P0_07, p.P0_12, config);
 
-    let mut npm1300 = NPM1300::new(twi);
+    let mut npm1300 = NPM1300::new(twi, embassy_time::Delay);
     defmt::info!("Enabling buck 2...");
     let _ = npm1300.enable_buck2().await;
 

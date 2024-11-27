@@ -29,14 +29,18 @@ pub struct DeviceInterface<I2c: embedded_hal_async::i2c::I2c> {
     pub i2c: I2c,
 }
 
-pub struct NPM1300<I2c: embedded_hal_async::i2c::I2c> {
+pub struct NPM1300<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayNs> {
     device: Device<DeviceInterface<I2c>>,
+    delay: Delay,
 }
 
-impl<I2c: embedded_hal_async::i2c::I2c> NPM1300<I2c> {
-    pub fn new(i2c: I2c) -> Self {
+impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayNs>
+    NPM1300<I2c, Delay>
+{
+    pub fn new(i2c: I2c, delay: Delay) -> Self {
         Self {
             device: Device::new(DeviceInterface { i2c }),
+            delay,
         }
     }
 }
