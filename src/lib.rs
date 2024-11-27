@@ -4,6 +4,7 @@ use device_driver::AsyncRegisterInterface;
 
 pub mod common;
 
+pub mod adc;
 pub mod buck;
 pub mod charger;
 pub mod gpios;
