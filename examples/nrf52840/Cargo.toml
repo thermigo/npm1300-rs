@@ -35,7 +35,7 @@ defmt = "0.3"
 defmt-rtt = "0.4"
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 
-npm1300-rs = { path = "../", features = ["defmt-03"] }
+npm1300-rs = { path = "../../", features = ["defmt-03"] }
 
 [patch.crates-io]
 embassy-nrf = { git = "https://github.com/embassy-rs/embassy.git", rev = "796f6c034a148e1fedb3196a2c73a155f5d0545f" }

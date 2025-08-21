@@ -5,7 +5,7 @@ pub use types::*;
 
 use libm::roundf;
 
-use crate::{common::Task, Bchgilimbatactive, Dietemphigh};
+use crate::{common::Task, Bchgilimbatactive, Dietemphigh, NPM1300Error};
 
 impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayNs>
     crate::NPM1300<I2c, Delay>
@@ -279,7 +279,30 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             Ok(())
         }
     }
+    /// Get the configured battery charger current
+    ///
+    /// * `Ok(u16)` - The configured charging current in milliamps (mA)
+    /// * `Err(NPM1300Error)` - An error occurred while reading the register values
+    pub async fn get_charger_config_current(
+        &mut self,
+    ) -> Result<u16, crate::NPM1300Error<I2c::Error>> {
+        let msb = self
+            .device
+            .charger()
+            .bchgisetmsb()
+            .read_async()
+            .await?
+            .bchgisetchargemsb();
+        let lsb = self
+            .device
+            .charger()
+            .bchgisetlsb()
+            .read_async()
+            .await?
+            .bchgisetchargelsb();
 
+        Ok((msb as u16) << 2 | (lsb as u16) << 1)
+    }
     /// Set the battery discharge current limit
     ///
     /// Configures the maximum discharge current limit for the battery.
@@ -784,5 +807,34 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
                 })
             })
             .await
+    }
+
+    /// Get the current discharge current limit
+    ///
+    /// #returns
+    /// DischargeCurrentLimit enum
+    pub async fn get_discharge_current_limit(
+        &mut self,
+    ) -> Result<DischargeCurrentLimit, crate::NPM1300Error<I2c::Error>> {
+        let msb = self
+            .device
+            .charger()
+            .bchgisetdischargemsb()
+            .read_async()
+            .await?
+            .bchgisetdischargemsb();
+        let lsb = self
+            .device
+            .charger()
+            .bchgisetdischargelsb()
+            .read_async()
+            .await?
+            .bchgisetdischargelsb();
+
+        match (msb, lsb) {
+            (42, 0) => Ok(DischargeCurrentLimit::Low),   // 200mA case
+            (207, 1) => Ok(DischargeCurrentLimit::High), // 1000mA case
+            _ => Err(NPM1300Error::InvalidDischargeCurrentValue { msb, lsb }),
+        }
     }
 }

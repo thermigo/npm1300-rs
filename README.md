@@ -22,7 +22,8 @@ This crate provides both low-level register access and a high-level API for mana
 | SYSREG — System regulator                 |        ✅         |         ✅         |
 | CHARGER — Battery charger                 |        ✅         |         ✅         |
 | BUCK — Buck regulators                    |        ✅         |         ✅         |
-| LOADSW/LDO — Load switches/LDO regulators |        ❌         |         ❌         |
+| LOADSW — Load switches                    |        ✅         |         ✅         |
+| LDO — LDO regulators                      |        ❌         |         ❌         |
 | LEDDRV — LED drivers                      |        ✅         |         ✅         |
 | GPIO — General-purpose I/O                |        ✅         |         ✅         |
 | ADC - System Monitor                      |        ✅         |         ⚠️         |

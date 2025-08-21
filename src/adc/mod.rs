@@ -1,5 +1,11 @@
+mod types;
+
+// Re-export everything in types.rs
+pub use types::*;
+
 use crate::{
-    common::Task, NtcThermistorType, Ntcautotim, Tempautotim, Vbatautoenable, Vbatburstenable,
+    charger::DischargeCurrentLimit, common::Task, Ibatmeasenable, NtcThermistorType, Ntcautotim,
+    Tempautotim, Vbatautoenable, Vbatburstenable,
 };
 use libm::logf;
 
@@ -691,5 +697,134 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             .read_async()
             .await?
             .tempautotim())
+    }
+
+    /// Configure auto ibat measurement enabled. It seems you dont
+    /// need to trigger the measurement, it is done automatically
+    /// when you measure vbat
+    ///
+    /// # Arguments
+    ///
+    /// * `enable` - If true, enable IBAT measurement
+    pub async fn configure_ibat_measurement(
+        &mut self,
+        enable: bool,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .adc()
+            .adcibatmeasen()
+            .modify_async(|reg| {
+                reg.set_ibatmeasenable(if enable {
+                    Ibatmeasenable::Ibaton
+                } else {
+                    Ibatmeasenable::Ibatoff
+                })
+            })
+            .await
+    }
+
+    ///Get ibat status, this register is 4 bit wide,
+    /// but i dont want to do breaking changes in the the
+    /// device.yaml in case someone is using this functionality,
+    /// but this is how it is read in the  npm1300 charger c example
+    ///
+    ///
+    /// Ibat status register:
+    ///
+    /// define IBAT_STAT_DISCHARGE      0x04U
+    /// define IBAT_STAT_CHARGE_TRICKLE 0x0CU
+    /// define IBAT_STAT_CHARGE_COOL    0x0DU
+    /// define IBAT_STAT_CHARGE_NORMAL  0x0FU
+    ///
+    ///
+    pub async fn get_ibat_status(
+        &mut self,
+    ) -> Result<IbatStatuscodes, crate::NPM1300Error<I2c::Error>> {
+        let msb = self
+            .device
+            .adc()
+            .adcibatmeasstatus()
+            .read_async()
+            .await?
+            .bchargermode();
+        let lsb = self
+            .device
+            .adc()
+            .adcibatmeasstatus()
+            .read_async()
+            .await?
+            .bchargericharge();
+
+        // 3. Combine them into a 4-bit value:
+        let raw_status = ((msb as u8) << 2) | (lsb as u8);
+
+        // 4. Convert the 4-bit code into our enum
+        let status_enum = IbatStatuscodes::from(raw_status);
+
+        return Ok(status_enum);
+    }
+
+    /// Measure IBAT current.
+    /// This is a 10 bit value which seems
+    /// to use the same register as the one used in vbat burst
+    /// so it might not be compatible with the vbat burst measurement
+    /// the ibat measurement is a 1023 bit value which is scaled to
+    /// the current max charge and discharge current, so the scaling is
+    /// variable and needs to be scaled based on what is currently
+    /// happening in the charger
+    ///
+    /// # Returns
+    /// Raw ac ibat value as uint16
+    ///
+    pub async fn measure_ibat_raw(&mut self) -> Result<u16, crate::NPM1300Error<I2c::Error>> {
+        // Read measurement result
+        let msb = self
+            .device
+            .adc()
+            .adcvbatburstresultmsb(2)
+            .read_async()
+            .await?
+            .vbatresultmsb();
+
+        let lsb = self
+            .device
+            .adc()
+            .adcgp_1_resultlsbs()
+            .read_async()
+            .await?
+            .vbat_2_resultlsb();
+
+        // Convert result to u16
+        let result = ((msb as u16) << 2) | (lsb & 0x03) as u16;
+        return Ok(result);
+    }
+    /// Measure IBAT current and convert it to a scaled value
+    /// This is more at home in the ADC function, but i couldnt
+    /// figure out how to make it work get the max charge current
+    /// and discharge current limit from the charger lib
+    /// so i just put them in the charger lib
+    ///
+    /// # Returns
+    ///
+    /// a scaled signed integer in ma of the current charge or discharge current
+    pub async fn measure_ibat(&mut self) -> Result<f32, crate::NPM1300Error<I2c::Error>> {
+        let ibat_raw = self.measure_ibat_raw().await? as f32;
+        let ibat_status = self.get_ibat_status().await?;
+        let charger_max_current = self.get_charger_config_current().await? as f32;
+        let discharge_current_limit = self.get_discharge_current_limit().await?;
+        let ibat_scaled = match ibat_status {
+            IbatStatuscodes::IbatStatDischarge => {
+                let max_discharge_current = match discharge_current_limit {
+                    DischargeCurrentLimit::Low => 200,
+                    DischargeCurrentLimit::High => 1000,
+                } as f32;
+                (ibat_raw * -max_discharge_current) / 1024.0
+            }
+            IbatStatuscodes::IbatStatChargeTrickle
+            | IbatStatuscodes::IbatStatChargeCool
+            | IbatStatuscodes::IbatStatChargeNormal => (ibat_raw * charger_max_current) / 1024.0,
+            _ => 0.0,
+        };
+        return Ok(ibat_scaled);
     }
 }

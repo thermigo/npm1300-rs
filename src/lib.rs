@@ -6,6 +6,7 @@ pub mod common;
 
 pub mod adc;
 pub mod buck;
+pub mod ldsw;
 pub mod charger;
 pub mod gpios;
 pub mod leds;
@@ -34,6 +35,8 @@ pub enum NPM1300Error<I2cError> {
     InvalidVbatMeasurementDelayValue,
     #[error("invalid VSYS threshold")]
     InvalidPofVsysThreshold,
+    #[error("invalid discharge current value")]
+    InvalidDischargeCurrentValue { msb: u8, lsb: u8 },
 }
 
 #[derive(Debug)]
