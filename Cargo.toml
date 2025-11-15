@@ -11,6 +11,7 @@ embedded-hal-async = "1.0.0"
 defmt = { version = "0.3", optional = true }
 thiserror = { version = "2.0.3", default-features = false }
 libm = "0.2.11"
+bitflags = "2.10.0"
 
 [features]
 defmt-03 = ["dep:defmt", "device-driver/defmt-03"]

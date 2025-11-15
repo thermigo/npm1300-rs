@@ -9,6 +9,7 @@ pub mod buck;
 pub mod charger;
 pub mod gpios;
 pub mod leds;
+pub mod mainreg;
 pub mod pof;
 pub mod ship;
 pub mod sysreg;
@@ -22,6 +23,8 @@ pub enum NPM1300Error<I2cError> {
     I2c(I2cError),
     #[error("charger current {0:?} is too high")]
     ChargerCurrentTooHigh(u16),
+    #[error("invalid charge mode")]
+    InvalidChargeMode,
     #[error("invalid NTC threshold")]
     InvalidNtcThreshold,
     #[error("invalid die temperature stop/resume threshold")]

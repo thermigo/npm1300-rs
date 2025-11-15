@@ -1,5 +1,5 @@
 use crate::{
-    common::Task, NtcThermistorType, Ntcautotim, Tempautotim, Vbatautoenable, Vbatburstenable,
+    NtcThermistorType, Ntcautotim, Tempautotim, Vbatautoenable, Vbatburstenable, charger::DischargeCurrentLimit, common::Task
 };
 use libm::logf;
 
@@ -486,6 +486,60 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             .vbatdeltim())
     }
 
+    /// Calculate battery current in microamps (µA)
+    pub async fn calculate_ibat(
+        &mut self,
+            discharge_current_limit: DischargeCurrentLimit,
+            charge_current_limit_ma: u16,
+        ) -> Result<i32, crate::NPM1300Error<I2c::Error>> {
+        self.device
+        .adc()
+        .taskvbatmeasure()
+        .dispatch_async(|w| w.set_taskvbatmeasure(crate::adc::Task::Trigger))
+        .await?;
+
+        self.delay.delay_us(200).await;
+
+        let st   = self.device.adc().adcibatmeasstatus().read_async().await?;
+        let mode = st.bchargermode();
+        if st.batmeaseinvalid() == 1 { return Ok(0); }
+
+        let msb = self.device
+            .adc()
+            .adcvbatburstresultmsb(2)
+            .read_async()
+            .await?
+            .vbatresultmsb();
+
+        let lsb = self.device
+            .adc()
+            .adcgp_1_resultlsbs()
+            .read_async()
+            .await?
+            .vbat_2_resultlsb();
+
+        let code: u16 = ((msb as u16) << 2) | ((lsb & 0x03) as u16);
+
+        let idis_ma: i32 = match discharge_current_limit {
+            DischargeCurrentLimit::Low  => 200,
+            DischargeCurrentLimit::High => 1000,
+        };
+
+        let (full_scale_ua, sign): (i32, i32) = match mode {
+            3 => {
+                let ichg_ma = charge_current_limit_ma as i32;
+                (ichg_ma * 1250, -1)
+            }
+            1 | 2 => {
+                (idis_ma * 1120, 1)
+            }
+            _ => return Ok(0),
+        };
+
+        let ibat_ua = (full_scale_ua as i64 * code as i64) / 1023;
+        Ok((sign as i64 * ibat_ua) as i32)
+    }
+
     /// Configure auto VBAT measurement
     ///
     /// # Arguments
@@ -503,6 +557,28 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
                     Vbatautoenable::Autoenable
                 } else {
                     Vbatautoenable::Noauto
+                })
+            })
+            .await
+    }
+
+    /// Configure auto IBAT measurement after VBAT
+    ///
+    /// # Arguments
+    ///
+    /// * `enable` - If true, enable auto IBAT measurement after VBAT measurement
+    pub async fn configure_auto_ibat_measurement(
+        &mut self,
+        enable: bool,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .adc()
+            .adcibatmeasen()
+            .modify_async(|reg| {
+                reg.set_ibatmeasenable(if enable {
+                    1
+                } else {
+                    0
                 })
             })
             .await

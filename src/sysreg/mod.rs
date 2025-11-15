@@ -109,7 +109,7 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             is_vbus_out_active: status.vbusinvbusoutactive() == 1,
             is_vbus_undervoltage_detected: status.vbusinundervoltage() == 1,
             is_vbus_in_suspended: status.vbusinsuspendmodeactive() == 1,
-            is_vbus_in_overvoltage_protection_active: status.vbusinundervoltage() == 1,
+            is_vbus_in_overvoltage_protection_active: status.vbusinovrprotactive() == 1,
         })
     }
 }

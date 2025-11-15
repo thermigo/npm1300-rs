@@ -4,6 +4,147 @@ config:
   buffer_address_type: u16
   defmt_feature: defmt-03
 
+MAIN:
+  type: block
+  description: MAIN instance — Task, Event and Interrupt registers
+  address_offset: 0x0000
+  objects:
+    TASKSYSRESET:
+      type: command
+      description: Task Force a full reboot power-cycle
+      address: 0x01
+      size_bits_in: 1
+      fields_in:
+        TASKSYSRESET:
+          base: uint
+          start: 0
+          end: 1
+          try_conversion: crate::common::Task
+    EVENTSADCSET:
+      type: register
+      description: ADC Events Event Set (W1S)
+      address: 0x02
+      size_bits: 8
+      fields:
+        value: { base: uint, start: 0, end: 8, description: Raw event bits }
+    EVENTSADCCLR:
+      type: register
+      description: ADC Events Event Clear (W1C)
+      address: 0x03
+      size_bits: 8
+      fields:
+        value: { base: uint, start: 0, end: 8, description: Raw event bits }
+    INTENEVENTSADCSET:
+      type: register
+      description: ADC Events Interrupt Enable Set (W1S)
+      address: 0x04
+      size_bits: 8
+      fields:
+        value: { base: uint, start: 0, end: 8, description: Raw enable bits }
+    INTENEVENTSADCCLR:
+      type: register
+      description: ADC Events Interrupt Enable Clear (W1C)
+      address: 0x05
+      size_bits: 8
+      fields:
+        value: { base: uint, start: 0, end: 8, description: Raw enable bits }
+    EVENTSBCHARGER0SET:  { type: register, description: Battery Charger Temperature Events Event Set (W1S), address: 0x06, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSBCHARGER0CLR:  { type: register, description: Battery Charger Temperature Events Event Clear (W1C), address: 0x07, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSBCHARGER0SET: { type: register, description: Battery Charger Temperature Events Interrupt Enable Set (W1S), address: 0x08, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSBCHARGER0CLR: { type: register, description: Battery Charger Temperature Events Interrupt Enable Clear (W1C), address: 0x09, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSBCHARGER1SET:  { type: register, description: Battery Charger Status Events Event Set (W1S), address: 0x0A, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSBCHARGER1CLR:  { type: register, description: Battery Charger Status Events Event Clear (W1C), address: 0x0B, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSBCHARGER1SET: { type: register, description: Battery Charger Status Events Interrupt Enable Set (W1S), address: 0x0C, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSBCHARGER1CLR: { type: register, description: Battery Charger Status Events Interrupt Enable Clear (W1C), address: 0x0D, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSBCHARGER2SET:  { type: register, description: Battery Charger Battery Events Event Set (W1S), address: 0x0E, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSBCHARGER2CLR:  { type: register, description: Battery Charger Battery Events Event Clear (W1C), address: 0x0F, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSBCHARGER2SET: { type: register, description: Battery Charger Battery Events Interrupt Enable Set (W1S), address: 0x10, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSBCHARGER2CLR: { type: register, description: Battery Charger Battery Events Interrupt Enable Clear (W1C), address: 0x11, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSSHPHLDSET:
+      type: register
+      description: ShipHold pin Events Event Set (W1S)
+      address: 0x12
+      size_bits: 1
+      fields:
+        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 sets event }
+    EVENTSSHPHLDCLR:
+      type: register
+      description: ShipHold pin Events Event Clear (W1C)
+      address: 0x13
+      size_bits: 1
+      fields:
+        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 clears event }
+    INTENEVENTSSHPHLDSET:
+      type: register
+      description: ShipHold pin Events Interrupt Enable Set (W1S)
+      address: 0x14
+      size_bits: 1
+      fields:
+        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 enables interrupt }
+    INTENEVENTSSHPHLDCLR:
+      type: register
+      description: ShipHold pin Events Interrupt Enable Clear (W1C)
+      address: 0x15
+      size_bits: 1
+      fields:
+        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 disables interrupt }
+    EVENTSVBUSIN0SET:
+      type: register
+      description: VBUSIN Voltage Detection Events Event Set (W1S)
+      address: 0x16
+      size_bits: 6
+      fields:
+        EVENTVBUSDETECTED:          { base: bool, start: 0, description: Set event — VBUS detected }
+        EVENTVBUSREMOVED:           { base: bool, start: 1, description: Set event — VBUS removed }
+        EVENTVBUSOVRVOLTDETECTED:   { base: bool, start: 2, description: Set event — VBUS overvoltage detected }
+        EVENTVBUSOVRVOLTREMOVED:    { base: bool, start: 3, description: Set event — VBUS overvoltage removed }
+        EVENTVBUSUNDERVOLTDETECTED: { base: bool, start: 4, description: Set event — VBUS undervoltage detected }
+        EVENTVBUSUNDERVOLTREMOVED:  { base: bool, start: 5, description: Set event — VBUS undervoltage removed }
+    EVENTSVBUSIN0CLR:
+      type: register
+      description: VBUSIN Voltage Detection Events Event Clear (W1C)
+      address: 0x17
+      size_bits: 6
+      fields:
+        EVENTVBUSDETECTED:          { base: bool, start: 0, description: Clear event }
+        EVENTVBUSREMOVED:           { base: bool, start: 1, description: Clear event }
+        EVENTVBUSOVRVOLTDETECTED:   { base: bool, start: 2, description: Clear event }
+        EVENTVBUSOVRVOLTREMOVED:    { base: bool, start: 3, description: Clear event }
+        EVENTVBUSUNDERVOLTDETECTED: { base: bool, start: 4, description: Clear event }
+        EVENTVBUSUNDERVOLTREMOVED:  { base: bool, start: 5, description: Clear event }
+    INTENEVENTSVBUSIN0SET:
+      type: register
+      description: VBUSIN Voltage Detection Events Interrupt Enable Set (W1S)
+      address: 0x18
+      size_bits: 6
+      fields:
+        EVENTVBUSDETECTED:          { base: bool, start: 0, description: Enable IRQ }
+        EVENTVBUSREMOVED:           { base: bool, start: 1, description: Enable IRQ }
+        EVENTVBUSOVRVOLTDETECTED:   { base: bool, start: 2, description: Enable IRQ }
+        EVENTVBUSOVRVOLTREMOVED:    { base: bool, start: 3, description: Enable IRQ }
+        EVENTVBUSUNDERVOLTDETECTED: { base: bool, start: 4, description: Enable IRQ }
+        EVENTVBUSUNDERVOLTREMOVED:  { base: bool, start: 5, description: Enable IRQ }
+    INTENEVENTSVBUSIN0CLR:
+      type: register
+      description: VBUSIN Voltage Detection Events Interrupt Enable Clear (W1C)
+      address: 0x19
+      size_bits: 6
+      fields:
+        EVENTVBUSDETECTED:          { base: bool, start: 0, description: Disable IRQ }
+        EVENTVBUSREMOVED:           { base: bool, start: 1, description: Disable IRQ }
+        EVENTVBUSOVRVOLTDETECTED:   { base: bool, start: 2, description: Disable IRQ }
+        EVENTVBUSOVRVOLTREMOVED:    { base: bool, start: 3, description: Disable IRQ }
+        EVENTVBUSUNDERVOLTDETECTED: { base: bool, start: 4, description: Disable IRQ }
+        EVENTVBUSUNDERVOLTREMOVED:  { base: bool, start: 5, description: Disable IRQ }
+    EVENTSVBUSIN1SET:   { type: register, description: VBUSIN Thermal and USB Events Event Set (W1S), address: 0x1A, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSVBUSIN1CLR:   { type: register, description: VBUSIN Thermal and USB Events Event Clear (W1C), address: 0x1B, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSVBUSIN1SET: { type: register, description: VBUSIN Thermal and USB Events Interrupt Enable Set (W1S), address: 0x1C, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSVBUSIN1CLR: { type: register, description: VBUSIN Thermal and USB Events Interrupt Enable Clear (W1C), address: 0x1D, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSGPIOSET:   { type: register, description: GPIO Event Event Set (W1S), address: 0x22, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    EVENTSGPIOCLR:   { type: register, description: GPIO Event Event Clear (W1C), address: 0x23, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSGPIOSET: { type: register, description: GPIO Event Interrupt Enable Set (W1S), address: 0x24, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+    INTENEVENTSGPIOCLR: { type: register, description: GPIO Event Interrupt Enable Clear (W1C), address: 0x25, size_bits: 8, fields: { value: { base: uint, start: 0, end: 8 } } }
+
 VBUSIN:
   type: block
   description: VBUSIN registers
