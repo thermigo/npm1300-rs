@@ -353,8 +353,8 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
         let result = ((msb as u16) << 2) | (lsb & 0x03) as u16;
 
         // Convert result to f32
-        // 5.0 is VFSVSYS, the full scale voltage for measuring VSYS.
-        let result = convert_vadc_to_voltage(result, 5.0);
+        // 6.375 is VFSVSYS, the full scale voltage for measuring VSYS.
+        let result = convert_vadc_to_voltage(result, 6.375);
 
         Ok(result)
     }
