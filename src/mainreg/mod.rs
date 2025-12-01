@@ -6,48 +6,92 @@ pub use types::*;
 impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayNs>
     crate::NPM1300<I2c, Delay>
 {
-    pub async fn set_vbusin0_event_mask(&mut self, mask: Vbusin0EventMask) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().eventsvbusin_0_set().write_async(|reg| {
-            reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
-            reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
-            reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
-            reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
-            reg.set_eventvbusundervoltdetected(mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED));
-            reg.set_eventvbusundervoltremoved(mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED));
-        }).await
+    pub async fn set_vbusin0_event_mask(
+        &mut self,
+        mask: Vbusin0EventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .main()
+            .eventsvbusin_0_set()
+            .write_async(|reg| {
+                reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
+                reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
+                reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
+                reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
+                reg.set_eventvbusundervoltdetected(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED),
+                );
+                reg.set_eventvbusundervoltremoved(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED),
+                );
+            })
+            .await
     }
 
-    pub async fn clear_vbusin0_event_mask(&mut self, mask: Vbusin0EventMask) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().eventsvbusin_0_clr().write_async(|reg| {
-            reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
-            reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
-            reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
-            reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
-            reg.set_eventvbusundervoltdetected(mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED));
-            reg.set_eventvbusundervoltremoved(mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED));
-        }).await
+    pub async fn clear_vbusin0_event_mask(
+        &mut self,
+        mask: Vbusin0EventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .main()
+            .eventsvbusin_0_clr()
+            .write_async(|reg| {
+                reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
+                reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
+                reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
+                reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
+                reg.set_eventvbusundervoltdetected(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED),
+                );
+                reg.set_eventvbusundervoltremoved(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED),
+                );
+            })
+            .await
     }
 
-    pub async fn enable_vbusin0_interrupts(&mut self, mask: Vbusin0EventMask) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().inteneventsvbusin_0_set().write_async(|reg| {
-            reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
-            reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
-            reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
-            reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
-            reg.set_eventvbusundervoltdetected(mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED));
-            reg.set_eventvbusundervoltremoved(mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED));
-        }).await
+    pub async fn enable_vbusin0_interrupts(
+        &mut self,
+        mask: Vbusin0EventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .main()
+            .inteneventsvbusin_0_set()
+            .write_async(|reg| {
+                reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
+                reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
+                reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
+                reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
+                reg.set_eventvbusundervoltdetected(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED),
+                );
+                reg.set_eventvbusundervoltremoved(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED),
+                );
+            })
+            .await
     }
 
-    pub async fn disable_vbusin0_interrupts(&mut self, mask: Vbusin0EventMask) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().inteneventsvbusin_0_clr().write_async(|reg| {
-            reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
-            reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
-            reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
-            reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
-            reg.set_eventvbusundervoltdetected(mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED));
-            reg.set_eventvbusundervoltremoved(mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED));
-        }).await
+    pub async fn disable_vbusin0_interrupts(
+        &mut self,
+        mask: Vbusin0EventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .main()
+            .inteneventsvbusin_0_clr()
+            .write_async(|reg| {
+                reg.set_eventvbusdetected(mask.contains(Vbusin0EventMask::VBUS_DETECTED));
+                reg.set_eventvbusremoved(mask.contains(Vbusin0EventMask::VBUS_REMOVED));
+                reg.set_eventvbusovrvoltdetected(mask.contains(Vbusin0EventMask::OVRVOLT_DETECTED));
+                reg.set_eventvbusovrvoltremoved(mask.contains(Vbusin0EventMask::OVRVOLT_REMOVED));
+                reg.set_eventvbusundervoltdetected(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_DETECTED),
+                );
+                reg.set_eventvbusundervoltremoved(
+                    mask.contains(Vbusin0EventMask::UNDERVOLT_REMOVED),
+                );
+            })
+            .await
     }
 
     pub async fn set_adc_event_mask(
@@ -260,11 +304,13 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             .await
     }
 
-        pub async fn set_vbusin1_event_mask(
+    pub async fn set_vbusin1_event_mask(
         &mut self,
         mask: Vbusin1EventMask,
     ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().eventsvbusin_1_set()
+        self.device
+            .main()
+            .eventsvbusin_1_set()
             .write_async(|reg| reg.set_value(mask.bits()))
             .await
     }
@@ -273,7 +319,9 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
         &mut self,
         mask: Vbusin1EventMask,
     ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().eventsvbusin_1_clr()
+        self.device
+            .main()
+            .eventsvbusin_1_clr()
             .write_async(|reg| reg.set_value(mask.bits()))
             .await
     }
@@ -282,7 +330,9 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
         &mut self,
         mask: Vbusin1EventMask,
     ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().inteneventsvbusin_1_set()
+        self.device
+            .main()
+            .inteneventsvbusin_1_set()
             .write_async(|reg| reg.set_value(mask.bits()))
             .await
     }
@@ -291,7 +341,9 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
         &mut self,
         mask: Vbusin1EventMask,
     ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
-        self.device.main().inteneventsvbusin_1_clr()
+        self.device
+            .main()
+            .inteneventsvbusin_1_clr()
             .write_async(|reg| reg.set_value(mask.bits()))
             .await
     }
