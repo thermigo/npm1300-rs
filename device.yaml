@@ -64,30 +64,42 @@ MAIN:
       type: register
       description: ShipHold pin Events Event Set (W1S)
       address: 0x12
-      size_bits: 1
+      size_bits: 4
       fields:
-        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 sets event }
+        EVENTSHPHLDBTNPRESS: { base: bool, start: 0, end: 1, description: Writing 1 sets event }
+        EVENTSHPHLDBTNRELEASE: { base: bool, start: 1, end: 2, description: Writing 1 sets event }
+        EVENTSHPHLDEXIT: { base: bool, start: 2, end: 3, description: Writing 1 sets event }
+        EVENTWATCHDOGWARN: { base: bool, start: 3, end: 4, description: Writing 1 sets event }
     EVENTSSHPHLDCLR:
       type: register
       description: ShipHold pin Events Event Clear (W1C)
       address: 0x13
-      size_bits: 1
+      size_bits: 4
       fields:
-        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 clears event }
+        EVENTSHPHLDBTNPRESS: { base: bool, start: 0, end: 1, description: Writing 1 clears event }
+        EVENTSHPHLDBTNRELEASE: { base: bool, start: 1, end: 2, description: Writing 1 clears event }
+        EVENTSHPHLDEXIT: { base: bool, start: 2, end: 3, description: Writing 1 clears event }
+        EVENTWATCHDOGWARN: { base: bool, start: 3, end: 4, description: Writing 1 clears event }
     INTENEVENTSSHPHLDSET:
       type: register
       description: ShipHold pin Events Interrupt Enable Set (W1S)
       address: 0x14
-      size_bits: 1
+      size_bits: 4
       fields:
-        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 enables interrupt }
+        EVENTSHPHLDBTNPRESS: { base: bool, start: 0, end: 1, description: Writing 1 enables interrupt }
+        EVENTSHPHLDBTNRELEASE: { base: bool, start: 1, end: 2, description: Writing 1 enables interrupt }
+        EVENTSHPHLDEXIT: { base: bool, start: 2, end: 3, description: Writing 1 enables interrupt }
+        EVENTWATCHDOGWARN: { base: bool, start: 3, end: 4, description: Writing 1 enables interrupt }
     INTENEVENTSSHPHLDCLR:
       type: register
       description: ShipHold pin Events Interrupt Enable Clear (W1C)
       address: 0x15
-      size_bits: 1
+      size_bits: 4
       fields:
-        EVENTSHPHLD: { base: uint, start: 0, end: 1, description: Writing 1 disables interrupt }
+        EVENTSHPHLDBTNPRESS: { base: bool, start: 0, end: 1, description: Writing 1 disables interrupt }
+        EVENTSHPHLDBTNRELEASE: { base: bool, start: 1, end: 2, description: Writing 1 disables interrupt }
+        EVENTSHPHLDEXIT: { base: bool, start: 2, end: 3, description: Writing 1 disables interrupt }
+        EVENTWATCHDOGWARN: { base: bool, start: 3, end: 4, description: Writing 1 disables interrupt }
     EVENTSVBUSIN0SET:
       type: register
       description: VBUSIN Voltage Detection Events Event Set (W1S)

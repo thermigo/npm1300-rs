@@ -270,37 +270,84 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             .await
     }
 
-    pub async fn set_shphld_event(&mut self) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+    pub async fn set_shphld_event(
+        &mut self,
+        mask: ShipholdEventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
         self.device
             .main()
             .eventsshphldset()
-            .write_async(|reg| reg.set_eventshphld(1))
+            .write_async(|reg| {
+                reg.set_eventshphldbtnpress(mask.contains(ShipholdEventMask::BUTTON_PRESSED));
+                reg.set_eventshphldbtnrelease(mask.contains(ShipholdEventMask::BUTTON_RELEASED));
+                reg.set_eventshphldexit(mask.contains(ShipholdEventMask::SHIPHOLD_EXIT));
+                reg.set_eventwatchdogwarn(mask.contains(ShipholdEventMask::WATCHDOG_WARNING));
+            })
             .await
     }
 
-    pub async fn clear_shphld_event(&mut self) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+    pub async fn clear_shphld_event(
+        &mut self,
+        mask: ShipholdEventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
         self.device
             .main()
             .eventsshphldclr()
-            .write_async(|reg| reg.set_eventshphld(1))
+            .write_async(|reg| {
+                reg.set_eventshphldbtnpress(mask.contains(ShipholdEventMask::BUTTON_PRESSED));
+                reg.set_eventshphldbtnrelease(mask.contains(ShipholdEventMask::BUTTON_RELEASED));
+                reg.set_eventshphldexit(mask.contains(ShipholdEventMask::SHIPHOLD_EXIT));
+                reg.set_eventwatchdogwarn(mask.contains(ShipholdEventMask::WATCHDOG_WARNING));
+            })
             .await
     }
 
-    pub async fn enable_shphld_interrupt(&mut self) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+    pub async fn get_shiphold_events(
+        &mut self,
+    ) -> Result<ShipholdEventMask, crate::NPM1300Error<I2c::Error>> {
+        let reg = self.device.main().eventsshphldclr().read_async().await?;
+
+        let mut mask = ShipholdEventMask::empty();
+        mask.set(ShipholdEventMask::BUTTON_PRESSED, reg.eventshphldbtnpress());
+        mask.set(
+            ShipholdEventMask::BUTTON_RELEASED,
+            reg.eventshphldbtnrelease(),
+        );
+        mask.set(ShipholdEventMask::SHIPHOLD_EXIT, reg.eventshphldexit());
+        mask.set(ShipholdEventMask::WATCHDOG_WARNING, reg.eventwatchdogwarn());
+
+        Ok(mask)
+    }
+
+    pub async fn enable_shphld_interrupt(
+        &mut self,
+        mask: ShipholdEventMask,
+    ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
         self.device
             .main()
             .inteneventsshphldset()
-            .write_async(|reg| reg.set_eventshphld(1))
+            .write_async(|reg| {
+                reg.set_eventshphldbtnpress(mask.contains(ShipholdEventMask::BUTTON_PRESSED));
+                reg.set_eventshphldbtnrelease(mask.contains(ShipholdEventMask::BUTTON_RELEASED));
+                reg.set_eventshphldexit(mask.contains(ShipholdEventMask::SHIPHOLD_EXIT));
+                reg.set_eventwatchdogwarn(mask.contains(ShipholdEventMask::WATCHDOG_WARNING));
+            })
             .await
     }
 
     pub async fn disable_shphld_interrupt(
         &mut self,
+        mask: ShipholdEventMask,
     ) -> Result<(), crate::NPM1300Error<I2c::Error>> {
         self.device
             .main()
             .inteneventsshphldclr()
-            .write_async(|reg| reg.set_eventshphld(1))
+            .write_async(|reg| {
+                reg.set_eventshphldbtnpress(mask.contains(ShipholdEventMask::BUTTON_PRESSED));
+                reg.set_eventshphldbtnrelease(mask.contains(ShipholdEventMask::BUTTON_RELEASED));
+                reg.set_eventshphldexit(mask.contains(ShipholdEventMask::SHIPHOLD_EXIT));
+                reg.set_eventwatchdogwarn(mask.contains(ShipholdEventMask::WATCHDOG_WARNING));
+            })
             .await
     }
 
@@ -389,6 +436,14 @@ impl<I2c: embedded_hal_async::i2c::I2c, Delay: embedded_hal_async::delay::DelayN
             .main()
             .inteneventsgpioclr()
             .write_async(|reg| reg.set_value(mask))
+            .await
+    }
+
+    pub async fn trigger_sys_reset(&mut self) -> Result<(), crate::NPM1300Error<I2c::Error>> {
+        self.device
+            .main()
+            .tasksysreset()
+            .dispatch_async(|reg| reg.set_tasksysreset(crate::common::Task::Trigger))
             .await
     }
 }

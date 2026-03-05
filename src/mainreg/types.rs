@@ -23,3 +23,12 @@ bitflags! {
         const CC2_STATE_CHANGE           = 1 << 5;
     }
 }
+bitflags! {
+    #[derive(Default)]
+    pub struct ShipholdEventMask: u8 {
+        const BUTTON_PRESSED             = 1 << 0;
+        const BUTTON_RELEASED            = 1 << 1;
+        const SHIPHOLD_EXIT              = 1 << 2;
+        const WATCHDOG_WARNING           = 1 << 3;
+    }
+}
